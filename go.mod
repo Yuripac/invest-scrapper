@@ -1,4 +1,4 @@
-module github.com.br/yuripac/invest-scrapper
+module github.com/yuripac/invest-scrapper
 
 go 1.16
 

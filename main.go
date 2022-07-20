@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com.br/yuripac/invest-scrapper/scrapper"
+	"github.com/yuripac/invest-scrapper/scrapper"
 )
 
 var (
