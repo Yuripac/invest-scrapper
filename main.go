@@ -10,26 +10,31 @@ import (
 
 var (
 	scr = scrapper.StatusInvest{}
+	wg  = sync.WaitGroup{}
+)
+
+const (
+	walletFilename = "wallet.yml"
+	stocksFilename = "stocks.yml"
 )
 
 func main() {
-	config, err := scrapper.InitConfig("wallet.yml", "stocks.yml")
+	config, err := scrapper.InitConfig()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	stockNames, err := scrapper.GetWallet(config.Dir + "/" + config.WalletFilename)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	stocksPath := config.Dir + "/" + config.StocksFilename
-	file, _ := os.OpenFile(stocksPath, os.O_CREATE|os.O_RDWR, os.ModePerm)
+	file, _ := os.OpenFile(config.FilePath(stocksFilename), os.O_CREATE|os.O_RDWR, os.ModePerm)
 	defer file.Close()
 
-	wg := sync.WaitGroup{}
-	wg.Add(len(stockNames))
 	repo := scrapper.YMLRepo{File: file}
+
+	stockNames, err := scrapper.GetWallet(config.FilePath(walletFilename))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	wg.Add(len(stockNames))
 	for _, name := range stockNames {
 		go func(name string) {
 			defer wg.Done()
