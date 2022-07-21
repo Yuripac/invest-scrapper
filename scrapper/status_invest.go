@@ -1,7 +1,6 @@
 package scrapper
 
 import (
-	"log"
 	"regexp"
 	"strconv"
 	"strings"
@@ -17,30 +16,22 @@ const (
 	pathACOES = "/acoes/"
 )
 
-func (s *StatusInvest) Fetch(stockName string) Stock {
-	stock := Stock{Name: stockName}
-
+func (s *StatusInvest) FetchValue(name string) (float64, error) {
 	collector := colly.NewCollector()
 
-	addValue(collector, &stock)
-
-	collector.Visit(fullURL(stockName))
-
-	return stock
-}
-
-func addValue(c *colly.Collector, stock *Stock) {
-	c.OnHTML(
+	var value float64
+	var err error
+	collector.OnHTML(
 		"div[title='Valor atual do ativo'] .value",
 		func(e *colly.HTMLElement) {
 			textValue := strings.Replace(e.Text, ",", ".", -1)
-			value, err := strconv.ParseFloat(textValue, 32)
-			if err != nil {
-				log.Fatal(err)
-			}
-			stock.Value = value
+
+			value, err = strconv.ParseFloat(textValue, 32)
 		},
 	)
+
+	collector.Visit(fullURL(name))
+	return value, err
 }
 
 func fullURL(name string) string {

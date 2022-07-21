@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-
-	"gopkg.in/yaml.v3"
 )
 
 const configDir = "invest-scrapper-config"
@@ -28,20 +26,4 @@ func InitConfig() (*Config, error) {
 
 func (c *Config) FilePath(filename string) string {
 	return fmt.Sprintf("%s/%s", c.Dir, filename)
-}
-
-func GetWallet(walletPath string) ([]string, error) {
-	content, err := os.ReadFile(walletPath)
-
-	if err != nil {
-		return nil, err
-	}
-
-	var wallet []string
-	err = yaml.Unmarshal(content, &wallet)
-	if err != nil {
-		return nil, err
-	}
-
-	return wallet, nil
 }

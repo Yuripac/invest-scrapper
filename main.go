@@ -3,14 +3,12 @@ package main
 import (
 	"log"
 	"os"
-	"sync"
 
 	"github.com/yuripac/invest-scrapper/scrapper"
 )
 
 var (
 	scr = scrapper.StatusInvest{}
-	wg  = sync.WaitGroup{}
 )
 
 const (
@@ -29,22 +27,15 @@ func main() {
 
 	repo := scrapper.YMLRepo{File: file}
 
-	stockNames, err := scrapper.GetWallet(config.FilePath(walletFilename))
+	wallet, err := scrapper.InitWallet(config.FilePath(walletFilename))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	wg.Add(len(stockNames))
-	for _, name := range stockNames {
-		go func(name string) {
-			defer wg.Done()
-
-			stock := scr.Fetch(name)
-			if n, _ := repo.UpdateMaxValue(stock); n > 0 {
-				stock.SysNotify()
-			}
-		}(name)
+	wallet.FetchStockValues(&scr)
+	for _, stock := range wallet.Stocks {
+		if n, _ := repo.UpdateMaxValue(*stock); n > 0 {
+			stock.SysNotify()
+		}
 	}
-
-	wg.Wait()
 }
