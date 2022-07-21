@@ -26,13 +26,10 @@ func InitWallet(path string) (*Wallet, error) {
 		return nil, err
 	}
 
-	var stocks []*Stock
-	for _, name := range stockNames {
-		stocks = append(stocks, &Stock{Name: name})
-	}
-
 	wallet := Wallet{}
-	wallet.Stocks = stocks
+	for _, name := range stockNames {
+		wallet.Stocks = append(wallet.Stocks, &Stock{Name: name})
+	}
 
 	return &wallet, nil
 }
